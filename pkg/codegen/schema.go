@@ -706,7 +706,20 @@ func GenFieldsFromProperties(props []Property) []string {
 			}
 		}
 
-		field += fmt.Sprintf("    %s %s", goFieldName, p.GoTypeDef())
+		// Check x-go-anonymous, which will create an anonymous field in the struct
+		// with the type of the field.
+		isAnonymous := false
+		if extension, ok := p.Extensions[extGoAnonymousField]; ok {
+			if goAnonymousField, err := extParseGoAnonymousField(extension); err == nil && goAnonymousField {
+				isAnonymous = true
+			}
+		}
+
+		if isAnonymous {
+			field += fmt.Sprintf("    %s", p.GoTypeDef())
+		} else {
+			field += fmt.Sprintf("    %s %s", goFieldName, p.GoTypeDef())
+		}
 
 		shouldOmitEmpty := (!p.Required || p.ReadOnly || p.WriteOnly) &&
 			(!p.Required || !p.ReadOnly || !globalState.options.Compatibility.DisableRequiredReadOnlyAsPointer)

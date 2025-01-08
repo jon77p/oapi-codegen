@@ -26,6 +26,8 @@ const (
 	// extOapiCodegenOnlyHonourGoName is to be used to explicitly enforce the generation of a field as the `x-go-name` extension has describe it.
 	// This is intended to be used alongside the `allow-unexported-struct-field-names` Compatibility option
 	extOapiCodegenOnlyHonourGoName = "x-oapi-codegen-only-honour-go-name"
+	// extGoAnonymousField is used to mark a field as an anonymous field
+	extGoAnonymousField = "x-go-anonymous-field"
 )
 
 func extString(extPropValue interface{}) (string, error) {
@@ -110,4 +112,12 @@ func extParseOapiCodegenOnlyHonourGoName(extPropValue interface{}) (bool, error)
 		return false, fmt.Errorf("failed to convert type: %T", extPropValue)
 	}
 	return onlyHonourGoName, nil
+}
+
+func extParseGoAnonymousField(extPropValue interface{}) (bool, error) {
+	anonymousField, ok := extPropValue.(bool)
+	if !ok {
+		return false, fmt.Errorf("failed to convert type: %T", extPropValue)
+	}
+	return anonymousField, nil
 }
