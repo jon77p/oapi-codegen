@@ -254,6 +254,11 @@ func GenerateGoSchema(sref *openapi3.SchemaRef, path []string) (Schema, error) {
 
 	schema := sref.Value
 
+	outSchema := Schema{
+		Description: schema.Description,
+		OAPISchema:  schema,
+	}
+
 	// If Ref is set on the SchemaRef, it means that this type is actually a reference to
 	// another type. We're not de-referencing, so simply use the referenced type.
 	if IsGoTypeReference(sref.Ref) {
@@ -263,17 +268,8 @@ func GenerateGoSchema(sref *openapi3.SchemaRef, path []string) (Schema, error) {
 			return Schema{}, fmt.Errorf("error turning reference (%s) into a Go type: %s",
 				sref.Ref, err)
 		}
-		return Schema{
-			GoType:         refType,
-			Description:    schema.Description,
-			DefineViaAlias: true,
-			OAPISchema:     schema,
-		}, nil
-	}
-
-	outSchema := Schema{
-		Description: schema.Description,
-		OAPISchema:  schema,
+		outSchema.GoType = refType
+		outSchema.DefineViaAlias = true
 	}
 
 	// AllOf is interesting, and useful. It's the union of a number of other
